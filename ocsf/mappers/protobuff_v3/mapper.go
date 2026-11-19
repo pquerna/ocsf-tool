@@ -144,7 +144,7 @@ func (mapper *mapper) populateFieldsFromAttributes(message *Message, attributes 
 		switch field.Type {
 		case FIELD_TYPE_OBJECT:
 			field.DataType = attr.ObjectType
-			attributeIsSelfReferencing := field.DataType == message.Name
+			attributeIsSelfReferencing := message.GroupKey == "Object" && field.DataType == message.Name
 			_, isObjectMapped := GetMessage(field.DataType)
 			if !isObjectMapped && !attributeIsSelfReferencing {
 				object, schemaForObjectExists := mapper.getObject(field.DataType)
@@ -264,10 +264,10 @@ func GetEnum(name string) (*Enum, bool) {
 }
 
 func AddMessage(message *Message) {
-	GetMapper().Messages[ToMessageName(message.Name)] = message
+	GetMapper().Messages[message.GroupKey+":"+ToMessageName(message.Name)] = message
 }
 
 func GetMessage(name string) (*Message, bool) {
-	value, exists := GetMapper().Messages[ToMessageName(name)]
+	value, exists := GetMapper().Messages["Object:"+ToMessageName(name)]
 	return value, exists
 }
